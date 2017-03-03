@@ -5,12 +5,9 @@ CONFIG += c++11
 
 SOURCES += src/main.cpp \
     src/notification/notificationmanager.cpp
-#    src/notification/notificationsender.cpp
-
 
 HEADERS += \
     src/notification/notificationmanager.h
-#    src/notification/notificationsender.h
 
 RESOURCES += qml.qrc
 
