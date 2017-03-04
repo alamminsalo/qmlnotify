@@ -16,17 +16,12 @@
 #define NOTIFICATIONMANAGER_H
 
 #include <QObject>
-#include <QJsonObject>
 #include <QQmlApplicationEngine>
 #include <QQmlComponent>
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusInterface>
 #include <QDBusAbstractAdaptor>
-
-#ifdef Q_OS_WIN
-    #include <QQuickWindow>
-#endif
 
 class NotificationManager: public QDBusAbstractAdaptor
 {
@@ -52,10 +47,6 @@ private:
     QQmlComponent *component;
 
     QDBusInterface *interf;
-
-#ifdef Q_OS_WIN
-    QQuickWindow *hiddenWindow;
-#endif
 };
 
 #endif // NOTIFICATIONMANAGER_H

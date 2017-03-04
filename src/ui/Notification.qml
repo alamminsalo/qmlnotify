@@ -14,7 +14,6 @@
 
 import QtQuick 2.5
 import QtQuick.Window 2.0
-import QtQuick.Layouts 1.1
 
 /*
  * Reference implementation for qml notification.
@@ -46,8 +45,8 @@ Window {
 
     //======== Rest is reference //==============================================
     id: root
-    width: 400
-    height: 120
+    width: 300
+    height: 100
     color: "transparent"
 
     //Locations: 0 - topleft, 1 - topright, 2 - bottomleft, 3 - bottomright
@@ -58,13 +57,20 @@ Window {
         //Setup data
         titleText.text = properties.summary
         bodyText.text = properties.body
-        img.source = properties.icon
 
+        //Setup icon
+        if (properties.icon)
+            img.source = properties.icon
+
+        else if (properties.image_data)
+            img.source = properties.image_data
+
+        else
+            img.width = 0
+
+        //Setup timer
         timer.interval = properties.timeout !== -1 ? properties.timeout : 5000
         timer.start()
-
-        titleText.font.pixelSize = 16
-        bodyText.font.pixelSize = 13
     }
 
     Timer {
@@ -104,7 +110,6 @@ Window {
         if (visible){
             setPosition()
             show()
-            //raise()
             anim.start()
         }
     }
@@ -125,65 +130,93 @@ Window {
 
         color: "#222"
         clip: true
-        //radius: 10
 
         border {
             width: 4
             color: "white"
         }
 
-        Image {
-            id: img
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.horizontalCenter
-                rightMargin: 20
-                margins: 4
-            }
-
-            fillMode: Image.Stretch
-        }
-
-        ColumnLayout {
-
-            anchors {
-                left: parent.horizontalCenter
-                right: parent.right
-                top: parent.top
-                bottom: parent.bottom
-            }
-
-            anchors {
-                top: parent.top
-                left: img.right
-                bottom: parent.bottom
-                right: parent.right
-            }
-
-            Text {
-                id: titleText
-                color: "white"
-                wrapMode: Text.WordWrap
-                font.bold: true
-                font.pixelSize: 16
-            }
-
-            Text {
-                id: bodyText
-                color: "white"
-                wrapMode: Text.WordWrap
-                font.pixelSize: 14
-            }
-
-        }
-
-        MouseArea {
+        Item {
             anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-                timeout()
+            anchors.margins: parent.border.width
+
+            Image {
+                id: img
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                width: height
+                fillMode: Image.Stretch
+            }
+
+            Item {
+
+                anchors {
+                    left: img.right
+                    right: parent.right
+                    top: parent.top
+                    bottom: parent.bottom
+                    margins: 4
+                }
+
+                Text {
+                    id: titleText
+                    anchors {
+                        left: parent.left
+                        top: parent.top
+                        right: parent.right
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    color: "white"
+                    wrapMode: Text.WordWrap
+                    font.bold: true
+                    font.pixelSize: 13
+                }
+
+                Text {
+                    id: bodyText
+                    anchors {
+                        top: titleText.bottom
+                        topMargin: 4
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    color: "white"
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: 13
+                }
+            }
+
+            Rectangle {
+                id: progress
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                height: 6
+                width: root.visible ? baserect.width : 0
+                color: "white"
+                opacity: 0.7
+
+                Behavior on width {
+                    NumberAnimation {
+                        duration: timer.interval
+                    }
+                }
+            }
+
+            MouseArea {
+                id: mArea
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onClicked: {
+                    timeout()
+                }
             }
         }
     }
