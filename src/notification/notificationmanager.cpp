@@ -26,15 +26,18 @@ NotificationManager::NotificationManager(QQmlApplicationEngine *engine, const QS
     queue.clear();
 
     //Setup dbus listener
-    QDBusConnection::sessionBus().registerObject("/org/freedesktop/Notifications", parent);
-
-    QString matchString = "interface='org.freedesktop.Notifications',member='Notify',type='method_call',eavesdrop='true'";
-    interf = new QDBusInterface("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", QDBusConnection::sessionBus(), this);
-    interf->call("AddMatch", matchString);
+    if (!QDBusConnection::sessionBus().registerService("org.freedesktop.Notifications")) {
+        qDebug() << "Warning: Couldn't register service org.freedesktop.Notifications";
+    }
+    if (!QDBusConnection::sessionBus().registerObject("/org/freedesktop/Notifications", parent)) {
+        qDebug() << "Error: Couldn't register handler for org.freedesktop.Notifications";
+    }
 
     qDebug() << "started listener.";
 
     qDBusRegisterMetaType<QImage>();
+
+    setAutoRelaySignals(true);
 }
 
 NotificationManager::~NotificationManager()
@@ -63,8 +66,6 @@ void NotificationManager::Notify(const QDBusMessage &msg) {
     QVariantMap properties;
 
     for (int i=0; i < msg.arguments().size(); i++) {
-
-        qDebug() << msg.arguments().at(i);
 
         switch(i) {
         case 0:
@@ -108,6 +109,11 @@ void NotificationManager::Notify(const QDBusMessage &msg) {
     if (!currentObject){
         triggerNext();
     }
+}
+
+QString NotificationManager::GetServerInformation(QString &vendor, QString &version, QString &spec_version)
+{
+    return "";
 }
 
 void NotificationManager::triggerNext()
@@ -209,7 +215,7 @@ const QDBusArgument& operator>>(const QDBusArgument& arg, QImage &img) {
 
     arg.endStructure();
 
-    img = QImage((const uchar*) data.data(), width, height, bytesPerLine, QImage::Format_ARGB32);
+    img = QImage((uchar*) data.data(), width, height, bytesPerLine, QImage::Format_ARGB32);
     img = img.rgbSwapped();
 
     return arg;

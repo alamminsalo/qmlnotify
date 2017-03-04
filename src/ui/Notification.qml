@@ -30,6 +30,7 @@ Window {
     //  timeout -> message timout in ms
     //  actions -> see org.freedesktop.Notifications
     //  hints -> see org.freedesktop.Notifications
+    //  image_data -> base64 encoded png data
     //
     //  Usage: var appname = properties.app_name
     property var properties

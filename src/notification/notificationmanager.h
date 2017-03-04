@@ -37,6 +37,7 @@ private slots:
 
 public slots:
     Q_NOREPLY void Notify(const QDBusMessage &msg);
+    QString GetServerInformation(QString &vendor, QString &version, QString &spec_version);
 
 private:
     QQmlApplicationEngine *engine;
@@ -45,8 +46,6 @@ private:
     //Currently visible notification
     QObject *currentObject;
     QQmlComponent *component;
-
-    QDBusInterface *interf;
 };
 
 #endif // NOTIFICATIONMANAGER_H
