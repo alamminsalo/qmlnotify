@@ -7,7 +7,8 @@ SOURCES += src/main.cpp \
     src/notification/notificationmanager.cpp
 
 HEADERS += \
-    src/notification/notificationmanager.h
+    src/notification/notificationmanager.h \
+    src/notification/notificationutils.h
 
 RESOURCES += qml.qrc
 

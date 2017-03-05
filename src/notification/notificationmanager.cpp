@@ -16,6 +16,9 @@
 #include <QDebug>
 #include <QtDBus/QtDBus>
 #include <QImage>
+#include <QIcon>
+
+#include "notificationutils.h"
 
 NotificationManager::NotificationManager(QQmlApplicationEngine *engine, const QString &path, QObject *parent) : QDBusAbstractAdaptor(parent)
 {
@@ -33,6 +36,11 @@ NotificationManager::NotificationManager(QQmlApplicationEngine *engine, const QS
         qDebug() << "Error: Couldn't register handler for org.freedesktop.Notifications";
     }
 
+    QString matchString = "interface='org.freedesktop.Notifications',member='Notify',type='method_call',eavesdrop='true'";
+    QDBusInterface *interf = new QDBusInterface("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", QDBusConnection::sessionBus(), this);
+    interf->call("AddMatch", matchString);
+
+
     qDebug() << "started listener.";
 
     qDBusRegisterMetaType<QImage>();
@@ -42,15 +50,6 @@ NotificationManager::NotificationManager(QQmlApplicationEngine *engine, const QS
 
 NotificationManager::~NotificationManager()
 {
-}
-
-QByteArray base64Image(const QImage &img)
-{
-    QByteArray byteArray;
-    QBuffer buffer(&byteArray);
-    img.save(&buffer, "PNG"); // writes the image in PNG format inside the buffer
-
-    return "data:image/png;base64," + byteArray.toBase64();
 }
 
 #include <QDBusArgument>
@@ -63,48 +62,7 @@ QByteArray base64Image(const QImage &img)
  */
 void NotificationManager::Notify(const QDBusMessage &msg) {
 
-    QVariantMap properties;
-
-    for (int i=0; i < msg.arguments().size(); i++) {
-
-        switch(i) {
-        case 0:
-            properties["app_name"]    = msg.arguments().at(i).toString();
-            break;
-        case 1:
-            properties["app_id"]      = msg.arguments().at(i).toInt();
-            break;
-        case 2:
-            properties["icon"]        = msg.arguments().at(i).toString();
-            break;
-        case 3:
-            properties["summary"]     = msg.arguments().at(i).toString();
-            break;
-        case 4:
-            properties["body"]        = msg.arguments().at(i).toString();
-            break;
-        case 5:
-            properties["actions"]     = msg.arguments().at(i).toString();
-            break;
-        case 6:
-            properties["hints"]       = msg.arguments().at(i);
-            break;
-        case 7:
-            properties["timeout"]     = msg.arguments().at(i).toInt();
-        }
-    }
-
-    if (!properties["hints"].isNull()) {
-        QVariantMap elems = qdbus_cast<QVariantMap>(*(static_cast<QDBusArgument*>((void *)properties["hints"].data())));
-
-        //TODO: parse rest
-        QImage img = qdbus_cast<QImage>(elems["image_data"]);
-
-        if (!img.isNull())
-            properties["image_data"] =  base64Image(img);
-    }
-
-    queue.append(properties);
+    queue.append(parseMessage(msg));
 
     if (!currentObject){
         triggerNext();
@@ -145,78 +103,67 @@ void NotificationManager::triggerNext()
     }
 }
 
-/**
- * Automatic marshaling of a QImage for org.freedesktop.Notifications.Notify
- *
- * This function is from the Clementine project (see
- * http://www.clementine-player.org) and licensed under the GNU General Public
- * License, version 3 or later.
- *
- * Copyright 2010, David Sansome <me@davidsansome.com>
- */
-QDBusArgument& operator<<(QDBusArgument& arg, const QImage& image) {
-    if (image.isNull()) {
-        // Sometimes this gets called with a null QImage for no obvious reason.
-        arg.beginStructure();
-        arg << 0 << 0 << 0 << false << 0 << 0 << QByteArray();
-        arg.endStructure();
-        return arg;
-    }
-    QImage scaled = image.scaledToHeight(128, Qt::SmoothTransformation).convertToFormat(QImage::Format_ARGB32);
+QVariantMap NotificationManager::parseMessage(const QDBusMessage &msg)
+{
+    QVariantMap properties;
 
-#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-    // ABGR -> ARGB
-    QImage i = scaled.rgbSwapped();
-#else
-    // ABGR -> GBAR
-    QImage i(scaled.size(), scaled.format());
-    for (int y = 0; y < i.height(); ++y) {
-        QRgb *p = (QRgb*) scaled.scanLine(y);
-        QRgb *q = (QRgb*) i.scanLine(y);
-        QRgb *end = p + scaled.width();
-        while (p < end) {
-            *q = qRgba(qGreen(*p), qBlue(*p), qAlpha(*p), qRed(*p));
-            p++;
-            q++;
+    for (int i=0; i < msg.arguments().size(); i++) {
+
+        switch(i) {
+        case 0:
+            properties["app_name"]    = msg.arguments().at(i);
+            break;
+        case 1:
+            properties["app_id"]      = msg.arguments().at(i);
+            break;
+        case 2:
+            properties["icon"]        = msg.arguments().at(i);
+            break;
+        case 3:
+            properties["summary"]     = msg.arguments().at(i);
+            break;
+        case 4:
+            properties["body"]        = msg.arguments().at(i);
+            break;
+        case 5:
+            properties["actions"]     = msg.arguments().at(i);
+            break;
+        case 6:
+            properties["hints"]       = msg.arguments().at(i);
+            break;
+        case 7:
+            properties["timeout"]     = msg.arguments().at(i);
         }
     }
-#endif
 
-    arg.beginStructure();
-    arg << i.width();
-    arg << i.height();
-    arg << i.bytesPerLine();
-    arg << i.hasAlphaChannel();
-    int channels = i.isGrayscale() ? 1 : (i.hasAlphaChannel() ? 4 : 3);
-    arg << i.depth() / channels;
-    arg << channels;
-    arg << QByteArray(reinterpret_cast<const char*>(i.bits()), i.byteCount());
-    arg.endStructure();
-    return arg;
-}
+    if (!properties["hints"].isNull()) {
+        QVariantMap elems = qdbus_cast<QVariantMap>(*(static_cast<QDBusArgument*>((void *)properties["hints"].data())));
 
-/**
- * @brief operator >>
- * @param arg
- * @param img
- * @return
- */
-const QDBusArgument& operator>>(const QDBusArgument& arg, QImage &img) {
+        if (!elems.isEmpty()) {
 
-    arg.beginStructure();
+            if (properties["icon"].toString().isEmpty()) {
+                QImage img = qdbus_cast<QImage>(elems["image_data"]);
 
-    int width = qdbus_cast<int>(arg);
-    int height = qdbus_cast<int>(arg);
-    int bytesPerLine = qdbus_cast<int>(arg);
-    bool hasAlphaChannel = qdbus_cast<bool>(arg);
-    int mult = qdbus_cast<int>(arg);
-    int channels = qdbus_cast<int>(arg);
-    QByteArray data = qdbus_cast<QByteArray>(arg);
+                if (!img.isNull())
+                    properties["image_data"] =  utils::imageToBase64(img);
+            }
+            //TODO: parse rest
+        }
+    }
 
-    arg.endStructure();
+    if (properties["icon"].toString().isEmpty() && properties["image_data"].isNull()) {
+        //Attempt to find app icon from theme if not yet resolved
+        QString theme = QIcon::themeName();
+        if (!properties["app_name"].isNull()) {
+            QIcon icon = QIcon::fromTheme(properties["app_name"].toString().toLower());
+            if (!icon.isNull()) {
+                QImage img(icon.pixmap(128,128).toImage());
+                if (!img.isNull()) {
+                    properties["image_data"] = utils::imageToBase64(img);
+                }
+            }
+        }
+    }
 
-    img = QImage((uchar*) data.data(), width, height, bytesPerLine, QImage::Format_ARGB32);
-    img = img.rgbSwapped();
-
-    return arg;
+    return properties;
 }

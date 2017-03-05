@@ -46,6 +46,8 @@ private:
     //Currently visible notification
     QObject *currentObject;
     QQmlComponent *component;
+
+    QVariantMap parseMessage(const QDBusMessage &);
 };
 
 #endif // NOTIFICATIONMANAGER_H

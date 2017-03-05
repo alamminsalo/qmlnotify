@@ -50,8 +50,6 @@ Window {
     height: 100
     color: "transparent"
 
-    //Locations: 0 - topleft, 1 - topright, 2 - bottomleft, 3 - bottomright
-    property int location: 1
     property int destY: 0
 
     onPropertiesChanged: {
@@ -66,55 +64,76 @@ Window {
         else if (properties.image_data)
             img.source = properties.image_data
 
-        else
+        else {
+			root.width = 240 //Shorten the notification a bit
             img.width = 0
+		}
 
         //Setup timer
         timer.interval = properties.timeout !== -1 ? properties.timeout : 5000
         timer.start()
     }
 
+	// Use Noto Sans system font
+	FontLoader {
+		id: fontloader
+		name: "Noto Sans"
+	}
+
+	// Triggers timeout 
     Timer {
         id: timer
         onTriggered: timeout()
     }
 
+	// Location setup
+    property string location: 'topcenter'
     function setPosition(){
-        switch (location){
-        case 0:
-            x =  50
+        if (location === 'topleft') {
+            x =  50;
+            y = -height;
+            destY = 50;
+		}
+
+		else if (location === 'topright') {
+            x = Screen.width - width  - 50;
+            y = -height;
+            destY = 50;
+		}
+
+		else if (location === 'bottomleft') {
+            x = 50;
+            y = Screen.height;
+            destY = Screen.height - height  - 50;
+		}
+
+		else if (location === 'bottomright') {
+            x = Screen.width - width  - 50;
+            y = Screen.height;
+            destY = Screen.height - height - 50;
+		}
+
+		else if (location === 'topcenter') {
+			x = Screen.width / 2 - width / 2;
             y = -height
-            destY = 50
-            break
-
-        case 1:
-            x = Screen.width - width  - 50
-            y = -height
-            destY = 50
-            break
-
-        case 2:
-            x = 50
-            y = Screen.height
-            destY = Screen.height - height  - 50
-            break
-
-        case 3:
-            x = Screen.width - width  - 50
-            y = Screen.height
-            destY = Screen.height - height - 50
-            break
-        }
+            destY = 50;
+		}
     }
 
     onVisibleChanged: {
         if (visible){
+			// Setup initial position
             setPosition()
+
+			// Show the window
             show()
+
+			// Run the slide-in animation
             anim.start()
         }
     }
 
+	// Slide-in animation
     NumberAnimation {
         id: anim
         target: root
@@ -125,6 +144,7 @@ Window {
         easing.type: Easing.OutCubic
     }
 
+	// Actual notification part
     Rectangle {
         id: baserect
         anchors.fill: parent
@@ -173,7 +193,8 @@ Window {
                     color: "white"
                     wrapMode: Text.WordWrap
                     font.bold: true
-                    font.pixelSize: 13
+                    font.pixelSize: 14
+					font.family: fontloader.name
                 }
 
                 Text {
@@ -189,6 +210,7 @@ Window {
                     color: "white"
                     wrapMode: Text.WordWrap
                     font.pixelSize: 13
+					font.family: fontloader.name
                 }
             }
 
@@ -198,10 +220,10 @@ Window {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                height: 6
+                height: 4
                 width: root.visible ? baserect.width : 0
                 color: "white"
-                opacity: 0.7
+                opacity: 0.6
 
                 Behavior on width {
                     NumberAnimation {
