@@ -162,7 +162,7 @@ Window {
         id: baserect
         anchors.fill: parent
 
-		color: "#151515"
+		color: "#222"
         clip: true
 
 //        border {
@@ -194,7 +194,7 @@ Window {
 
 					Behavior on width {
 						NumberAnimation {
-							duration: 300
+							duration: 350
 							easing.type: Easing.OutCubic
 						}
 					}
@@ -252,7 +252,6 @@ Window {
                 height: 4
                 width: root.visible ? baserect.width : 0
                 color: "white"
-                opacity: 0.6
 
                 Behavior on width {
                     NumberAnimation {
