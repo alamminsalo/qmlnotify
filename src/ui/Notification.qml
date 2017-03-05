@@ -70,10 +70,8 @@ Window {
         else if (properties.app_icon)
             img.source = properties.app_icon
 
-        else {
+        else 
 			root.width = 240 //Shorten the notification a bit
-            img.width = 0
-		}
 
         //Setup timer
         timer.interval = properties.timeout !== -1 ? properties.timeout : 5000
@@ -93,7 +91,7 @@ Window {
     }
 
 	// Location setup
-    property string location: 'topcenter'
+    property string location: 'topright'
     function setPosition(){
         if (location === 'topleft') {
             x =  50;
@@ -126,16 +124,25 @@ Window {
 		}
     }
 
+	//Triggers when visible is set to true
     onVisibleChanged: {
         if (visible){
 			// Setup initial position
             setPosition()
 
-			// Show the window
-            show()
+			//Show after image has loaded (or failed to load)
+			if (img.status === Image.Loading) {
+				img.statusChanged.connect(function (){
+					show();
+					anim.start();
+				});
+			}
 
-			// Run the slide-in animation
-            anim.start()
+			//If image is not loading, show right away
+			else {
+				show()
+				anim.start()
+			}
         }
     }
 
@@ -147,7 +154,7 @@ Window {
         from: y
         to: destY
         duration: 300
-        easing.type: Easing.OutCubic
+        easing.type: Easing.OutBack
     }
 
 	// Actual notification part
@@ -155,37 +162,53 @@ Window {
         id: baserect
         anchors.fill: parent
 
-        color: "#222"
+		color: "#151515"
         clip: true
 
-        border {
-            width: 4
-            color: "white"
-        }
+//        border {
+//            width: 3
+//			color: "#c6b171"
+//        }
 
         Item {
             anchors.fill: parent
             anchors.margins: parent.border.width
 
-            Image {
-                id: img
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: parent.left
-                }
-                width: height
-                fillMode: Image.Stretch
-            }
+			Item {
+				//Image wrapper
+				id: imgwrap
+
+				anchors {
+					top: parent.top
+					bottom: parent.bottom
+					left: parent.left
+				}
+				width: img.status == Image.Ready ? parent.height * 0.9 : 0
+
+				Image {
+					id: img
+					anchors.centerIn: parent
+					width: parent.width * 0.8
+					height: width
+					fillMode: Image.Stretch
+
+					Behavior on width {
+						NumberAnimation {
+							duration: 300
+							easing.type: Easing.OutCubic
+						}
+					}
+				}
+			}
 
             Item {
 
                 anchors {
-                    left: img.right
+                    left: imgwrap.right
                     right: parent.right
                     top: parent.top
                     bottom: parent.bottom
-                    margins: 4
+                    margins: 10
                 }
 
                 Text {
