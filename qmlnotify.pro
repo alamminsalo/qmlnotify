@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick dbus
+QT += qml dbus
 CONFIG += c++11
 
 SOURCES += src/main.cpp \
