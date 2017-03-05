@@ -137,30 +137,25 @@ QVariantMap NotificationManager::parseMessage(const QDBusMessage &msg)
     }
 
     if (!properties["hints"].isNull()) {
-        QVariantMap elems = qdbus_cast<QVariantMap>(*(static_cast<QDBusArgument*>((void *)properties["hints"].data())));
+        QVariantMap hints = qdbus_cast<QVariantMap>(*(static_cast<QDBusArgument*>((void *)properties["hints"].data())));
 
-        if (!elems.isEmpty()) {
+        if (!hints.isEmpty()) {
+            QImage img = qdbus_cast<QImage>(hints["image_data"]);
 
-            if (properties["icon"].toString().isEmpty()) {
-                QImage img = qdbus_cast<QImage>(elems["image_data"]);
+            if (!img.isNull())
+                properties["image_data"] =  utils::imageToBase64(img);
 
-                if (!img.isNull())
-                    properties["image_data"] =  utils::imageToBase64(img);
-            }
             //TODO: parse rest
         }
     }
 
-    if (properties["icon"].toString().isEmpty() && properties["image_data"].isNull()) {
-        //Attempt to find app icon from theme if not yet resolved
-        QString theme = QIcon::themeName();
-        if (!properties["app_name"].isNull()) {
-            QIcon icon = QIcon::fromTheme(properties["app_name"].toString().toLower());
-            if (!icon.isNull()) {
-                QImage img(icon.pixmap(128,128).toImage());
-                if (!img.isNull()) {
-                    properties["image_data"] = utils::imageToBase64(img);
-                }
+    //Attempt to find app icon from theme
+    if (!properties["app_name"].isNull()) {
+        QIcon icon = QIcon::fromTheme(properties["app_name"].toString().toLower());
+        if (!icon.isNull()) {
+            QImage img(icon.pixmap(128,128).toImage());
+            if (!img.isNull()) {
+                properties["app_icon"] = utils::imageToBase64(img);
             }
         }
     }

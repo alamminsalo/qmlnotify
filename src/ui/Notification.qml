@@ -26,11 +26,14 @@ Window {
     //  app_id -> numeral id
     //  summary -> title text
     //  body -> message body text
-    //  icon -> message icon/img
+    //  icon -> message icon/img path
     //  timeout -> message timout in ms
     //  actions -> see org.freedesktop.Notifications
     //  hints -> see org.freedesktop.Notifications
-    //  image_data -> base64 encoded png data
+    //
+    //  Non-standard variables:
+    //  image_data -> base64 encoded png data passed via hints.image_data
+    //  app_icon -> base64 encoded png data from icon theme
     //
     //  Usage: var appname = properties.app_name
     property var properties
@@ -63,6 +66,9 @@ Window {
 
         else if (properties.image_data)
             img.source = properties.image_data
+
+        else if (properties.app_icon)
+            img.source = properties.app_icon
 
         else {
 			root.width = 240 //Shorten the notification a bit
