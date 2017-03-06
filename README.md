@@ -10,7 +10,6 @@ Dbus notification server which implements org.freedesktop.Notifications for desk
 * Enjoy!
 
 ##Screenshots
-![Shark png](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/screenshot.png)
 ![Terminal gif](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/terminal.gif)
 
 ##Building instructions
