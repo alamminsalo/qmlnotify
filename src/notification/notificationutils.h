@@ -129,6 +129,10 @@ const QDBusArgument& operator>>(const QDBusArgument& arg, QImage &img) {
     img = QImage((uchar*) data.data(), width, height, bytesPerLine, QImage::Format_ARGB32);
     img = img.rgbSwapped();
 
+    Q_UNUSED(hasAlphaChannel);
+    Q_UNUSED(mult);
+    Q_UNUSED(channels);
+
     return arg;
 }
 

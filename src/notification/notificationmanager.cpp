@@ -71,6 +71,7 @@ void NotificationManager::Notify(const QDBusMessage &msg) {
 
 QString NotificationManager::GetServerInformation(QString &vendor, QString &version, QString &spec_version)
 {
+    //TODO: check for use case
     return "";
 }
 
@@ -136,6 +137,7 @@ QVariantMap NotificationManager::parseMessage(const QDBusMessage &msg)
         }
     }
 
+    //Parse hints
     if (!properties["hints"].isNull()) {
         QVariantMap hints = qdbus_cast<QVariantMap>(*(static_cast<QDBusArgument*>((void *)properties["hints"].data())));
 
@@ -149,15 +151,26 @@ QVariantMap NotificationManager::parseMessage(const QDBusMessage &msg)
         }
     }
 
-    //Attempt to find app icon from theme
-    if (!properties["app_name"].isNull()) {
-        QIcon icon = QIcon::fromTheme(properties["app_name"].toString().toLower());
-        if (!icon.isNull()) {
-            QImage img(icon.pixmap(128,128).toImage());
-            if (!img.isNull()) {
-                properties["app_icon"] = utils::imageToBase64(img);
-            }
+    //Check that theme name is set, 'hicolor' can be sign of theme not set or qt having problems it
+    QString theme = QIcon::themeName();
+    if (theme == "hicolor") {
+        qDebug() << "QIcon::themeName() returned 'hicolor', is this right?";
+    }
+
+    //If icon doesn't point to a file, attempt to fetch it from theme
+    if (!QFile(properties["icon"].toString()).exists()) {
+        if (QIcon::hasThemeIcon(properties["icon"].toString().toLower())) {
+            QIcon icon = QIcon::fromTheme(properties["icon"].toString().toLower());
+            if (!icon.isNull())
+                properties["icon"] = utils::imageToBase64(icon.pixmap(128,128).toImage());
         }
+    }
+
+    //Attempt to fetch application icon from theme to app_icon variable
+    if (QIcon::hasThemeIcon(properties["app_name"].toString().toLower())) {
+        QIcon icon = QIcon::fromTheme(properties["app_name"].toString().toLower());
+        if (!icon.isNull())
+            properties["app_icon"] = utils::imageToBase64(icon.pixmap(128,128).toImage());
     }
 
     return properties;

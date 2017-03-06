@@ -60,7 +60,7 @@ Window {
         titleText.text = properties.summary
         bodyText.text = properties.body
 
-        //Setup icon
+        //Setup icon: icon > image_data > app_icon
         if (properties.icon)
             img.source = properties.icon
 
