@@ -2,6 +2,8 @@
 
 Dbus notification server which implements org.freedesktop.Notifications for desktop notifications
 
+![Terminal gif](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/terminal.gif)
+
 ##Usage
 
 * Start the server 
@@ -9,17 +11,12 @@ Dbus notification server which implements org.freedesktop.Notifications for desk
 * Write your own qml component and start the server with param `--qml $YOUR_QML_NOTIFICATION_COMPONENT`
 * Enjoy!
 
-##Screenshots
-![Terminal gif](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/terminal.gif)
-
 ##Building instructions
 
 ####Install needed packages (arch examples)
-
 ```
 sudo pacman -S qt5-base
 ```
-
 ####Clone from github and compile
 ```
 git clone https://github.com/alamminsalo/qmlnotify
@@ -28,10 +25,8 @@ mkdir build && cd build
 qmake ../
 make
 ```
-
 ####Test it
 ```
 ./qmlnotify
 ```
-
 
