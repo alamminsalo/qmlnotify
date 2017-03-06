@@ -1,8 +1,9 @@
 #qmlnotify
 
-Dbus notification server which implements org.freedesktop.Notifications for desktop notifications
-
 ![Terminal gif](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/terminal.gif)
+
+##What is it?
+Desktop notification server which implements org.freedesktop.Notifications, using modern Qt/Qml technologies
 
 ##Usage
 
