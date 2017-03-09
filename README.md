@@ -1,6 +1,7 @@
 #qmlnotify
 
 ![Terminal gif](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/terminal.gif)
+![Terminal gif2](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/record2.gif)
 
 ##What is it?
 Desktop notification server which implements org.freedesktop.Notifications, using modern Qt/Qml technologies
