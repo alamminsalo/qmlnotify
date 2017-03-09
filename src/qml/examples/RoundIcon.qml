@@ -190,6 +190,13 @@ Window {
             fillMode: Image.PreserveAspectCrop
             smooth: true
             visible: false
+
+			Rectangle {
+				anchors.fill: parent
+				color: "#000"
+				opacity: 0.333
+			}
+
         }
 
         OpacityMask {
@@ -227,6 +234,7 @@ Window {
                     font.pixelSize: 14
                     font.family: fontloader.name
                     style: Text.Raised; styleColor: "black"
+					elide: Text.ElideRight
                 }
 
                 Text {
@@ -244,6 +252,7 @@ Window {
                     wrapMode: Text.Wrap
                     font.pixelSize: 14
                     style: Text.Raised; styleColor: "black"
+					elide: Text.ElideRight
                 }
             }
         }
