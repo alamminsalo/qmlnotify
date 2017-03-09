@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="Notification.qml">src/ui/Notification.qml</file>
+        <file alias="Default.qml">src/qml/examples/FlatDark.qml</file>
     </qresource>
 </RCC>

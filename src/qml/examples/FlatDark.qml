@@ -61,14 +61,15 @@ Window {
         bodyText.text = properties.body
 
         //Setup icon: icon > image_data > app_icon
-        if (properties.icon)
+        if (properties.app_icon)
+            img.source = properties.app_icon
+
+		else if (properties.icon)
             img.source = properties.icon
 
         else if (properties.image_data)
             img.source = properties.image_data
 
-        else if (properties.app_icon)
-            img.source = properties.app_icon
 
         else 
 			root.width = 240 //Shorten the notification a bit
@@ -164,11 +165,6 @@ Window {
 
 		color: "#222"
         clip: true
-
-//        border {
-//            width: 3
-//			color: "#c6b171"
-//        }
 
         Item {
             anchors.fill: parent

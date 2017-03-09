@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
     //Use reference implementation as default notification
-    QString component_path = "qrc:/Notification.qml";
+    QString component_path = "qrc:/Default.qml";
 
     for (int i = 0; i < argc; i++) {
         if (QString(argv[i]) == "--qml") {
