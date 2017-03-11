@@ -126,7 +126,7 @@ Window {
             //Show after image has loaded (or failed to load)
             if (img.status === Image.Loading) {
                 img.statusChanged.connect(function (){
-                    show();
+					show();
                 });
             }
 
@@ -182,7 +182,7 @@ Window {
             }
         }
 
-        Image {
+        AnimatedImage {
             id: img
             anchors.centerIn: parent
             width: parent.width
@@ -224,6 +224,7 @@ Window {
                         top: parent.top
                         right: parent.right
                         bottom: parent.verticalCenter
+						bottomMargin: 5
                     }
                     fontSizeMode: Text.Fit
                     verticalAlignment: Text.AlignVCenter
@@ -235,6 +236,8 @@ Window {
                     font.family: fontloader.name
                     style: Text.Raised; styleColor: "black"
 					elide: Text.ElideRight
+					renderType: Text.NativeRendering
+					font.hintingPreference: Font.PreferFullHinting
                 }
 
                 Text {
@@ -253,6 +256,8 @@ Window {
                     font.pixelSize: 14
                     style: Text.Raised; styleColor: "black"
 					elide: Text.ElideRight
+					renderType: Text.NativeRendering
+					font.hintingPreference: Font.PreferFullHinting
                 }
             }
         }
