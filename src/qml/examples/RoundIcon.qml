@@ -191,11 +191,11 @@ Window {
             smooth: true
             visible: false
 
-			Rectangle {
-				anchors.fill: parent
-				color: "#000"
-				opacity: 0.333
-			}
+			//Rectangle {
+			//	anchors.fill: parent
+			//	color: "#000"
+			//	opacity: 0.333
+			//}
 
         }
 
