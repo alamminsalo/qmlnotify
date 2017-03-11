@@ -1,7 +1,7 @@
 #qmlnotify
 
 ![gif1](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/record1.gif)
-![gif2](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/animated.gif)
+![gif2](https://raw.githubusercontent.com/alamminsalo/qmlnotify/master/screenshots/waveform.gif)
 
 ##What is it?
 Desktop notification server which implements org.freedesktop.Notifications, using modern Qt/Qml technologies
