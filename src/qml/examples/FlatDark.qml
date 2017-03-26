@@ -17,7 +17,7 @@ import QtQuick.Window 2.0
 
 /*
  * Reference implementation for qml notification.
- * Feel free to modify or completely reimplement your own
+ setup* Feel free to modify or completely reimplement your own
  */
 Window {
     //  notification data entries:
@@ -76,7 +76,32 @@ Window {
 
         //Setup timer
         timer.interval = properties.timeout !== -1 ? properties.timeout : 5000
-        timer.start()
+
+		setup();
+    }
+
+    function setup() {
+		// Setup initial position
+		setPosition()
+
+		function startAll() {
+				root.visible = true
+				show();
+				anim.start();
+				timer.start()
+		}
+
+		//Show after image has loaded (or failed to load)
+		if (img.status === Image.Loading) {
+			img.statusChanged.connect(function (){
+				startAll();
+			});
+		}
+
+		//If image is not loading, show right away
+		else {
+			startAll();
+		}
     }
 
 	// Use Noto Sans system font
@@ -125,28 +150,6 @@ Window {
 		}
     }
 
-	//Triggers when visible is set to true
-    onVisibleChanged: {
-        if (visible){
-			// Setup initial position
-            setPosition()
-
-			//Show after image has loaded (or failed to load)
-			if (img.status === Image.Loading) {
-				img.statusChanged.connect(function (){
-					show();
-					anim.start();
-				});
-			}
-
-			//If image is not loading, show right away
-			else {
-				show()
-				anim.start()
-			}
-        }
-    }
-
 	// Slide-in animation
     NumberAnimation {
         id: anim
@@ -181,12 +184,12 @@ Window {
 				}
 				width: img.status == Image.Ready ? parent.height * 0.9 : 0
 
-				Image {
+				AnimatedImage {
 					id: img
 					anchors.centerIn: parent
 					width: parent.width * 0.8
 					height: width
-					fillMode: Image.Stretch
+					fillMode: Image.PreserveAspectCrop
 
 					Behavior on width {
 						NumberAnimation {
@@ -236,6 +239,7 @@ Window {
                     wrapMode: Text.WordWrap
                     font.pixelSize: 13
 					font.family: fontloader.name
+					elide: Text.ElideRight
                 }
             }
 

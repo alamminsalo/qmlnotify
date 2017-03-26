@@ -74,10 +74,10 @@ Window {
 
         //Setup timer
         timer.interval = properties.timeout !== -1 ? properties.timeout : 5000
-        timer.start()
 
 		progress.animationDuration = timer.interval
-		progress.arcBegin = 360
+
+		setup();
     }
 
     // Use Noto Sans system font
@@ -93,8 +93,7 @@ Window {
     }
 
     // Location setup
-    property string location: 'topright'
-    function setPosition(){
+    function setPosition(location){
         if (location === 'topleft') {
             x =  50;
             y = 50;
@@ -121,24 +120,28 @@ Window {
         }
     }
 
-    //Triggers when visible is set to true
-    onVisibleChanged: {
-        if (visible){
-            // Setup initial position
-            setPosition()
+    function setup() {
+		// Setup initial position
+		setPosition('topright')
 
-            //Show after image has loaded (or failed to load)
-            if (img.status === Image.Loading) {
-                img.statusChanged.connect(function (){
-					show();
-                });
-            }
+		function run() {
+			root.visible = true;
+			show();
+			timer.start()
+			progress.arcBegin = 360
+		}
 
-            //If image is not loading, show right away
-            else {
-                show()
-            }
-        }
+		//Show after image has loaded (or failed to load)
+		if (img.status === Image.Loading) {
+			img.statusChanged.connect(function (){
+				run();
+			});
+		}
+
+		//If image is not loading, show right away
+		else {
+			run();
+		}
     }
 
     // Slide-out animation

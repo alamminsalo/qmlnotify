@@ -92,14 +92,10 @@ void NotificationManager::triggerNext()
         }
         if (component->isReady()) {
             currentObject = component->create(engine->rootContext());
-
-            // Set data to notification
-            currentObject->setProperty("properties", properties);
-
             QObject::connect(currentObject, SIGNAL(timeout()), this, SLOT(triggerNext()));
 
-            // Trigger notification
-            currentObject->setProperty("visible", QVariant::fromValue(true));
+            // Set data to notification, triggers notification
+            currentObject->setProperty("properties", properties);
         }
     }
 }
