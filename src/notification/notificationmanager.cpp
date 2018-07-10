@@ -69,7 +69,7 @@ void NotificationManager::Notify(const QDBusMessage &msg) {
     }
 }
 
-QString NotificationManager::GetServerInformation(QString &/*vendor*/, QString &/*version*/, QString &/*spec_version*/)
+QString NotificationManager::GetServerInformation(QString &vendor, QString &version, QString &spec_version)
 {
     //TODO: check for use case
     return "";
